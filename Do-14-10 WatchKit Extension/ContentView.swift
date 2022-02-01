@@ -8,14 +8,30 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        Text("Hello, World!")
-            .padding()
-    }
+	@ObservedObject var model: Model
+
+	init(model: Model) {
+		self.model = model
+	}
+	
+	var body: some View {
+		
+		VStack {
+			HStack {
+				Button("-10 min") {	model.setTimepointasdate(new: model.timepointasdate - 600)}
+				Button("+10 min") { model.setTimepointasdate(new: model.timepointasdate + 600)}
+			}
+			.buttonStyle(.bordered)
+			
+			Text(model.timepointasstring).font(.title)
+			
+			Button("Now") { model.setTimepointasdate(new: Date())}
+		}
+	}
 }
 
 struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+	static var previews: some View {
+		ContentView(model: Model(Date()))
+	}
 }

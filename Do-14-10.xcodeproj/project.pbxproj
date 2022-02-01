@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		40A6A0BC27A983A90036A37E /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40A6A0BB27A983A90036A37E /* Model.swift */; };
 		40F53D0327A81AB7008AC784 /* Do-14-10 WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 40F53D0227A81AB7008AC784 /* Do-14-10 WatchKit App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		40F53D0827A81AB9008AC784 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 40F53D0727A81AB9008AC784 /* Assets.xcassets */; };
 		40F53D0E27A81AB9008AC784 /* Do-14-10 WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 40F53D0D27A81AB9008AC784 /* Do-14-10 WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -60,6 +61,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		40A6A0BB27A983A90036A37E /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		40F53CFE27A81AB6008AC784 /* Do-14-10.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Do-14-10.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		40F53D0227A81AB7008AC784 /* Do-14-10 WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Do-14-10 WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		40F53D0727A81AB9008AC784 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -113,8 +115,9 @@
 		40F53D1127A81AB9008AC784 /* Do-14-10 WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
-				40F53D1227A81AB9008AC784 /* ContentView.swift */,
 				40F53D1427A81AB9008AC784 /* Do_14_10App.swift */,
+				40F53D1227A81AB9008AC784 /* ContentView.swift */,
+				40A6A0BB27A983A90036A37E /* Model.swift */,
 				40F53D1627A81AB9008AC784 /* ComplicationController.swift */,
 				40F53D1827A81ABB008AC784 /* Assets.xcassets */,
 				40F53D1D27A81ABB008AC784 /* Info.plist */,
@@ -261,6 +264,7 @@
 				40F53D1527A81AB9008AC784 /* Do_14_10App.swift in Sources */,
 				40F53D1327A81AB9008AC784 /* ContentView.swift in Sources */,
 				40F53D1727A81AB9008AC784 /* ComplicationController.swift in Sources */,
+				40A6A0BC27A983A90036A37E /* Model.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
