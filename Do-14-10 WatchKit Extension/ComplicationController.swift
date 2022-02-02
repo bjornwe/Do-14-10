@@ -147,12 +147,13 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 																							 gaugeColorLocations: [0.0, 300.0 / 500.0, 450.0 / 500.0] as [NSNumber],
 																							 fillFraction: 1.0)
 		
-		let atHour = CLKSimpleTextProvider(text: model.timepointasstring)
-		print("GraphicCircle "+model.timepointasstring)
+		let atHour = CLKSimpleTextProvider(text: String(Model.counter))
+		let actualValue = CLKSimpleTextProvider(text: String(Model.counter)) // model.timepointasstring)
+		print("GraphicCircle "+model.timepointasstring+" "+String(Model.counter))
 
 		// Create the template using the providers.
 		return CLKComplicationTemplateGraphicCircularOpenGaugeSimpleText(gaugeProvider: gaugeProvider,
-																																		 bottomTextProvider: CLKSimpleTextProvider(text: model.timepointasstring),
+																																		 bottomTextProvider: actualValue,
 																																		 centerTextProvider: atHour)
 	}
 	
@@ -160,7 +161,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	private func createCircularSmallTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let label = CLKSimpleTextProvider(text: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: String(Model.counter)) // model.timepointasstring)
 		print("CircularSmall "+model.timepointasstring)
 		
 		// Create the template using the providers.

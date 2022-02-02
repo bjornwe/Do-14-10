@@ -14,6 +14,7 @@ class Model: ObservableObject {
 	
 	var timepointasstring: String //= "xx:xx"
 	var timepointasdate: Date //= Date()
+	static var counter = 1
 	
 	init(_ initialTimepointasdate: Date) {
 		self.timepointasdate = initialTimepointasdate
@@ -27,6 +28,8 @@ class Model: ObservableObject {
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "HH:mm"
 		timepointasstring = dateFormatter.string(from: new)
+		
+		Model.counter += 1
 		
 		Task.detached {
 				await self.updateComplications()
