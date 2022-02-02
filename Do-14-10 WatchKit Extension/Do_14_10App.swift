@@ -16,7 +16,7 @@ struct Do_14_10App: App {
 	var body: some Scene {
 		WindowGroup {
 			NavigationView {
-				ContentView(model: Model(Date()))
+				ContentView(model: Model())
 			}
 		}
 	}

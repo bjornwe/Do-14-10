@@ -10,25 +10,25 @@ import ClockKit
 
 @MainActor
 class Model: ObservableObject {
-	static let shared = Model(Date())
+	static let shared = Model()
 	
-	var timepointasstring: String //= "xx:xx"
-	var timepointasdate: Date //= Date()
+	static var timepointasstring: String = "xx:yy" // Used in ComplicationController to auto-update complication
+	static var timepointasdate: Date = Date() //  -""-
 	static var counter = 1
-	
-	init(_ initialTimepointasdate: Date) {
-		self.timepointasdate = initialTimepointasdate
-		self.timepointasstring = "00:00"
-	}
+	static var dayofweek: String = "ddd"
+	@Published var timepointinstancestring: String = "xx:yy"  // Used to auto-update ContentView
 		
 	public func setTimepointasdate(new: Date)  -> Void
 	{
-		timepointasdate = new
-		
 		let dateFormatter = DateFormatter()
+
+		Model.timepointasdate = new		
 		dateFormatter.dateFormat = "HH:mm"
-		timepointasstring = dateFormatter.string(from: new)
-		
+		Model.timepointasstring = dateFormatter.string(from: new)
+		self.timepointinstancestring = Model.timepointasstring
+		dateFormatter.dateFormat = "EEE"
+		Model.dayofweek = dateFormatter.string(from: new)
+
 		Model.counter += 1
 		
 		Task.detached {

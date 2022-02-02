@@ -131,8 +131,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	private func createModularSmallTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let label = CLKSimpleTextProvider(text: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
-		print("ModularSmall "+model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
+		print("ModularSmall "+Model.timepointasstring)
 	
 		// Create the template using the providers.
 		return CLKComplicationTemplateModularSmallStackText(line1TextProvider: label,
@@ -141,28 +141,34 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	
 	// Return a graphic circle template.
 	private func createGraphicCircleTemplate(forDate date: Date) -> CLKComplicationTemplate {
+		
+		var timeRemaining: TimeInterval = 0.0
+		timeRemaining = Date().timeIntervalSince(Model.timepointasdate) - (24.0 * 60.0 * 60.0)
+		if timeRemaining > 1.0 { timeRemaining = 1.0 }
+		if timeRemaining < 0.0 { timeRemaining = 0.0 }
+		
 		// Create the data providers.
 			let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
 																							 gaugeColors: [.green, .yellow, .red],
-																							 gaugeColorLocations: [0.0, 300.0 / 500.0, 450.0 / 500.0] as [NSNumber],
-																							 fillFraction: 1.0)
+																								 gaugeColorLocations: [0.0, 0.5, 0.75] as [NSNumber],
+																								 fillFraction: Float(timeRemaining))
 		
-		let atHour = CLKSimpleTextProvider(text: String(Model.counter))
-		let actualValue = CLKSimpleTextProvider(text: String(Model.counter)) // model.timepointasstring)
-		print("GraphicCircle "+model.timepointasstring+" "+String(Model.counter))
+		let atHour = CLKSimpleTextProvider(text: String(Model.timepointasstring))
+		let dayofweek = CLKSimpleTextProvider(text: Model.dayofweek)
+		print("GraphicCircle "+Model.timepointasstring+" "+String(Model.counter))
 
 		// Create the template using the providers.
 		return CLKComplicationTemplateGraphicCircularOpenGaugeSimpleText(gaugeProvider: gaugeProvider,
-																																		 bottomTextProvider: actualValue,
-																																		 centerTextProvider: atHour)
+																																		 bottomTextProvider: atHour,
+																																		 centerTextProvider: dayofweek)
 	}
 	
 	// Return a circular small template.
 	private func createCircularSmallTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let label = CLKSimpleTextProvider(text: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: String(Model.counter)) // model.timepointasstring)
-		print("CircularSmall "+model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: String(Model.counter)) // Model.timepointasstring)
+		print("CircularSmall "+Model.timepointasstring)
 		
 		// Create the template using the providers.
 		return CLKComplicationTemplateCircularSmallStackText(line1TextProvider: label,
@@ -173,12 +179,12 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	private func createGraphicCornerTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		//let label = CLKSimpleTextProvider(text: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
 		let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
 																							 gaugeColors: [.green, .yellow, .red],
 																							 gaugeColorLocations: [0.0, 300.0 / 500.0, 450.0 / 500.0] as [NSNumber],
 																							 fillFraction: 0.5)
-		print("GraphicCorner "+model.timepointasstring)
+		print("GraphicCorner "+Model.timepointasstring)
 		
 		// Create the template using the providers.
 		return CLKComplicationTemplateGraphicCornerGaugeText(gaugeProvider: gaugeProvider,
@@ -191,8 +197,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	private func createModularLargeTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let titleTextProvider = CLKSimpleTextProvider(text: "14/10", shortText: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
-		print("ModularLarge "+model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
+		print("ModularLarge "+Model.timepointasstring)
 		
 		// Create the template using the providers.
 		let imageProvider = CLKImageProvider(onePieceImage: UIImage(named: "55x55")!)
@@ -205,8 +211,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	private func createUtilitarianSmallFlatTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let flatUtilitarianImageProvider = CLKImageProvider(onePieceImage: UIImage(named: "55x55")!)
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
-		print("UtilitarianSmall "+model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
+		print("UtilitarianSmall "+Model.timepointasstring)
 		
 		// Create the template using the providers.
 		return CLKComplicationTemplateUtilitarianSmallFlat(textProvider: actualValue,
@@ -217,8 +223,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	private func createUtilitarianLargeTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let flatUtilitarianImageProvider = CLKImageProvider(onePieceImage: UIImage(named: "55x55")!)
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
-		print("UtilitarianLarge "+model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
+		print("UtilitarianLarge "+Model.timepointasstring)
 		
 		// Create the template using the providers.
 		return CLKComplicationTemplateUtilitarianLargeFlat(textProvider: actualValue,
@@ -229,8 +235,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	private func createExtraLargeTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let label = CLKSimpleTextProvider(text: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
-		print("ExtraLarge "+model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
+		print("ExtraLarge "+Model.timepointasstring)
 		
 		// Create the template using the providers.
 		return CLKComplicationTemplateExtraLargeStackText(line1TextProvider: label,
@@ -242,9 +248,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		let image = UIImage(named: "55x55")
 		let imageProvider = CLKFullColorImageProvider(fullColorImage: image!)
 		let titleTextProvider = CLKSimpleTextProvider(text: "14/10", shortText: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
 		let percentage = Float(1.0)
-		print("GraphicRectangular "+model.timepointasstring)
+		print("GraphicRectangular "+Model.timepointasstring)
 		
 		let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
 																							 gaugeColors: [.green, .yellow, .red],
@@ -263,8 +269,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		let image = UIImage(named: "55x55")
 		let circle = CLKComplicationTemplateGraphicCircularImage(
 			imageProvider: CLKFullColorImageProvider(fullColorImage: image!))
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
-		print("GraphicBezel "+model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
+		print("GraphicBezel "+Model.timepointasstring)
 		
 		// Create the bezel template using the circle template and the text provider.
 		return CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: circle,
@@ -280,8 +286,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 																							 gaugeColors: [.green, .yellow, .red],
 																							 gaugeColorLocations: [0.0, 300.0 / 500.0, 450.0 / 500.0] as [NSNumber],
 																							 fillFraction: percentage)
-		let actualValue = CLKSimpleTextProvider(text: model.timepointasstring)
-		print("GraphicExtraLarge "+model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
+		print("GraphicExtraLarge "+Model.timepointasstring)
 		
 		return CLKComplicationTemplateGraphicExtraLargeCircularOpenGaugeSimpleText(
 			gaugeProvider: gaugeProvider,

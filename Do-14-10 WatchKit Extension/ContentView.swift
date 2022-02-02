@@ -18,12 +18,12 @@ struct ContentView: View {
 		
 		VStack {
 			HStack {
-				Button("-10 min") {	model.setTimepointasdate(new: model.timepointasdate - 600)}
-				Button("+10 min") { model.setTimepointasdate(new: model.timepointasdate + 600)}
+				Button("-10 min") { model.setTimepointasdate(new: Model.timepointasdate - 600)}
+				Button("+10 min") { model.setTimepointasdate(new: Model.timepointasdate + 600)}
 			}
 			.buttonStyle(.bordered)
 			
-			Text(model.timepointasstring).font(.title)
+			Text(model.timepointinstancestring).font(.title)
 			
 			Button("Now") { model.setTimepointasdate(new: Date())}
 		}
@@ -32,6 +32,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
 	static var previews: some View {
-		ContentView(model: Model(Date()))
+		ContentView(model: Model())
 	}
 }
