@@ -175,22 +175,24 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 																												 line2TextProvider: actualValue)
 	}
 	
-	// Return a circular small template.
+	// Return a graphic corner small template.
 	private func createGraphicCornerTemplate(forDate date: Date) -> CLKComplicationTemplate {
-		// Create the data providers.
-		//let label = CLKSimpleTextProvider(text: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
-		let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
+		print("GraphicCorner " + Model.timepointasstring)
+
+		return CLKComplicationTemplateGraphicCornerStackText(
+			innerTextProvider: CLKSimpleTextProvider(text: "14/10 time"),
+			outerTextProvider: CLKSimpleTextProvider(text: Model.timepointasstring))
+
+		/*let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
 																							 gaugeColors: [.green, .yellow, .red],
 																							 gaugeColorLocations: [0.0, 300.0 / 500.0, 450.0 / 500.0] as [NSNumber],
-																							 fillFraction: 0.5)
-		print("GraphicCorner "+Model.timepointasstring)
-		
-		// Create the template using the providers.
+																							 fillFraction: 0.5)*/
+
+		/*/ Create the template using the providers.
 		return CLKComplicationTemplateGraphicCornerGaugeText(gaugeProvider: gaugeProvider,
 																												 leadingTextProvider: CLKSimpleTextProvider(text: "a"),
 																												 trailingTextProvider: CLKSimpleTextProvider(text: "b"),
-																												 outerTextProvider: actualValue)
+																												 outerTextProvider: actualValue)*/
 	}
 	
 	// Return a modular large template.
