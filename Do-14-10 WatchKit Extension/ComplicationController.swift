@@ -17,10 +17,6 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		// Call the handler with the last entry date you can currently provide or nil if you can't support future timelines
 		
 		// Define how far into the future the app can provide data.
-		
-		// Indicate that the app can provide timeline entries for the next 48 hours.
-		// let next48hours: Date = Date().addingTimeInterval(48.0 * 60.0 * 60.0)
-		
 		handler(.distantFuture)
 	}
 	
@@ -36,12 +32,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 			CLKComplicationDescriptor(
 				identifier: "Do_14/10",
 				displayName: "14/10",
-				supportedFamilies: CLKComplicationFamily.allCases  //,
-				//userInfo: myDictionary
+				supportedFamilies: CLKComplicationFamily.allCases
 			)
 		]
-		
-		// Call the handler with the currently supported complication descriptors
+
 		handler(descriptors)
 	}
 	
@@ -51,9 +45,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void
 	) {
 		let template = createTemplate(forComplication: complication, date: Date())
-		
-		let entry = CLKComplicationTimelineEntry(
-			date: Date(), complicationTemplate: template)
+		let entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: template)
 		
 		handler(entry)
 	}
@@ -67,16 +59,15 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		// Create an array to hold the timeline entries.
 		var entries: [CLKComplicationTimelineEntry] = []
 		
-		for i in 0..<60 {
-			entries.append(CLKComplicationTimelineEntry(
-				date: date + Double(i), complicationTemplate: template))
+		let hours = [12 , 24 , 36 , 48]
+	
+		for i in hours {
+			let entry = CLKComplicationTimelineEntry(
+				date: date + Double(i),
+				complicationTemplate: template)
+			
+			entries.append(entry)
 		}
-		
-		/*let marks = [12.0 , 24.0 , 36.0 , 48.0]
-		for hour in marks {
-			entries.append(CLKComplicationTimelineEntry(
-				date: date + hour, complicationTemplate: template))
-		}*/
 		
 		handler(entries)
 	}
@@ -96,7 +87,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	// MARK: - Sample Templates
 	
 	// Select the correct template based on the complication's family.
-	private func createTemplate(forComplication complication: CLKComplication, date: Date) -> CLKComplicationTemplate {
+	private func createTemplate(
+		forComplication complication: CLKComplication,
+		date: Date) -> CLKComplicationTemplate
+		{
 		switch complication.family {
 			case .modularSmall:
 				return createModularSmallTemplate(forDate: date)
@@ -155,7 +149,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		
 		let atHour = CLKSimpleTextProvider(text: String(Model.timepointasstring))
 		let dayofweek = CLKSimpleTextProvider(text: Model.dayofweek)
-		print("GraphicCircle "+Model.timepointasstring+" "+String(Model.counter))
+		print("GraphicCircle " + Model.timepointasstring)
 
 		// Create the template using the providers.
 		return CLKComplicationTemplateGraphicCircularOpenGaugeSimpleText(gaugeProvider: gaugeProvider,
@@ -167,7 +161,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	private func createCircularSmallTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let label = CLKSimpleTextProvider(text: "14/10")
-		let actualValue = CLKSimpleTextProvider(text: String(Model.counter)) // Model.timepointasstring)
+		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring)
 		print("CircularSmall "+Model.timepointasstring)
 		
 		// Create the template using the providers.
@@ -177,22 +171,11 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	
 	// Return a graphic corner small template.
 	private func createGraphicCornerTemplate(forDate date: Date) -> CLKComplicationTemplate {
-		print("GraphicCorner " + Model.timepointasstring)
+		print("GraphicCornerStackText " + Model.timepointasstring)
 
 		return CLKComplicationTemplateGraphicCornerStackText(
-			innerTextProvider: CLKSimpleTextProvider(text: "14/10 time"),
-			outerTextProvider: CLKSimpleTextProvider(text: Model.timepointasstring))
-
-		/*let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
-																							 gaugeColors: [.green, .yellow, .red],
-																							 gaugeColorLocations: [0.0, 300.0 / 500.0, 450.0 / 500.0] as [NSNumber],
-																							 fillFraction: 0.5)*/
-
-		/*/ Create the template using the providers.
-		return CLKComplicationTemplateGraphicCornerGaugeText(gaugeProvider: gaugeProvider,
-																												 leadingTextProvider: CLKSimpleTextProvider(text: "a"),
-																												 trailingTextProvider: CLKSimpleTextProvider(text: "b"),
-																												 outerTextProvider: actualValue)*/
+			innerTextProvider: CLKSimpleTextProvider(text: "14/10 " + Model.dayofweek),
+			outerTextProvider: CLKSimpleTextProvider(text: Model.timepointasstring) )
 	}
 	
 	// Return a modular large template.
@@ -207,8 +190,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		return CLKComplicationTemplateModularLargeStandardBody(headerImageProvider: imageProvider,
 																													 headerTextProvider: titleTextProvider,
 																													 body1TextProvider: actualValue,
-																													 body2TextProvider: CLKSimpleTextProvider(text: "2345"))
+																													 body2TextProvider: CLKSimpleTextProvider(text: Model.dayofweek))
 	}
+	
 	// Return a utilitarian small flat template.
 	private func createUtilitarianSmallFlatTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
@@ -293,7 +277,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		
 		return CLKComplicationTemplateGraphicExtraLargeCircularOpenGaugeSimpleText(
 			gaugeProvider: gaugeProvider,
-			bottomTextProvider: CLKSimpleTextProvider(text: "3456"),
+			bottomTextProvider: CLKSimpleTextProvider(text: "14/10 " + Model.dayofweek),
 			centerTextProvider: actualValue)
 	}
 }

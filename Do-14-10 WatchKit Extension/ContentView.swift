@@ -9,10 +9,6 @@ import SwiftUI
 
 struct ContentView: View {
 	@ObservedObject var model: Model
-
-	init(model: Model) {
-		self.model = model
-	}
 	
 	var body: some View {
 		
@@ -23,7 +19,7 @@ struct ContentView: View {
 			}
 			.buttonStyle(.bordered)
 			
-			Text(model.timepointinstancestring).font(.title)
+			Text(model.weekdayinstancestring + " " + model.timepointinstancestring).font(.title)
 			
 			Button("Now") { model.setTimepointasdate(new: Date())}
 		}
