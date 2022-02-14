@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "closure #1 in ContentView.body.getter:ContentView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "model.timepoint">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Model.fetchfromfile(filename:):Model.swift">
+      </ContextState>
+      <ContextState
+         contextName = "Model.init():Model.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "weekdayinstancestring">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ComplicationController.createGraphicCircleTemplate(forDate:):ComplicationController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "timepointasstring">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Model.setTimepointasdate(new:):Model.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "timepointasdate">
+            </PersistentString>
+            <PersistentString
+               value = "timepointasstring">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

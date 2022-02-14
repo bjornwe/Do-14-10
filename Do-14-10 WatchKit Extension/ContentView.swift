@@ -28,6 +28,20 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
 	static var previews: some View {
-		ContentView(model: Model())
+		//let cc: ComplicationController = ComplicationController()
+		
+		Group {  // Max 10 items in group
+			//ComplicationController().createModularSmallTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createGraphicCircleTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createCircularSmallTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createGraphicCornerTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createModularLargeTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createUtilitarianSmallFlatTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createUtilitarianLargeTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createExtraLargeTemplate(forDate: Date()).previewContext()
+			ComplicationController().createGraphicRectangularTemplate(forDate: Date()).previewContext()
+			ComplicationController().createGraphicBezelTemplate(forDate: Date()).previewContext()
+			ComplicationController().createGraphicExtraLargeTemplate(forDate: Date()).previewContext()
+		}
 	}
 }
