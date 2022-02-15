@@ -17,7 +17,13 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		// Call the handler with the last entry date you can currently provide or nil if you can't support future timelines
 		
 		// Define how far into the future the app can provide data.
-		handler(.distantFuture)
+		let pastNextBreakfast: Date = Model.timepointasdate + (14.02 * 60.0 * 60.0)
+		handler(pastNextBreakfast) //.distantFuture)
+	}
+	
+	func getTimelineStartDate(for complication: CLKComplication, withHandler handler: @escaping (Date?) -> Void) {
+		let approachingBreakfast: Date = Model.timepointasdate + (10.98 * 60.0 * 60.0)
+		handler(approachingBreakfast)
 	}
 	
 	func getPrivacyBehavior(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationPrivacyBehavior) -> Void) {
@@ -35,18 +41,28 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 				supportedFamilies: CLKComplicationFamily.allCases
 			)
 		]
-
+		
 		handler(descriptors)
 	}
 	
 	// Return the current timeline entry
-	func getCurrentTimelineEntry(
-		for complication: CLKComplication,
-		withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void
-	) {
-		let template = createTemplate(forComplication: complication, date: Date())
-		let entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: template)
+	func getCurrentTimelineEntry(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
 		
+		var nextTime: Date
+		let timeRemaining: TimeInterval = (14.0 * 60.0 * 60.0) - Date().timeIntervalSince(Model.timepointasdate)
+		if timeRemaining > 3.0 { nextTime = Model.timepointasdate + (11.0 * 60.0 * 60.0) }  // Still less than 11 hours of fasting
+		else if timeRemaining < 0.0 { nextTime = .distantFuture } // Past breakfast time
+		else {
+			// After 11 hours fasting we need to update every 10 minutes
+			var dateNextIteration: Date = Model.timepointasdate + (11.0 * 60.0 * 60.0) + (10.0 * 60.0)
+			while (Date() > dateNextIteration) {
+				dateNextIteration = dateNextIteration + (10.0 * 60.0)
+			}
+			nextTime = dateNextIteration
+		}
+		
+		let template = createTemplate(forComplication: complication, date: nextTime)
+		let entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: template)
 		handler(entry)
 	}
 	
@@ -55,18 +71,30 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		
 		// Call the handler with the timeline entries after the given date
 		let template = createTemplate(forComplication: complication, date: date)
+		var entries: [CLKComplicationTimelineEntry] = []  // Create an array to hold the timeline entries.
+		var nextEntry: Date
+		let timeRemaining: TimeInterval = (14.0 * 60.0 * 60.0) - date.timeIntervalSince(Model.timepointasdate)
 		
-		// Create an array to hold the timeline entries.
-		var entries: [CLKComplicationTimelineEntry] = []
-		
-		let hours = [12 , 24 , 36 , 48]
-	
-		for i in hours {
-			let entry = CLKComplicationTimelineEntry(
-				date: date + Double(i),
-				complicationTemplate: template)
+		if timeRemaining < 0.0 {   // Past breakfast time
+			nextEntry = .distantFuture
+		}
+		else {
+		  nextEntry = Model.timepointasdate + (11.0 * 60.0 * 60.0)
 			
-			entries.append(entry)
+			// After 11:00 hours we need to update every 10 minutes for three hours (if limit so permits)
+			for i in 0...min(18,limit) {
+				nextEntry = nextEntry + (Double(i) * 60.0)
+				
+				// Don't add entries in the past
+				// If we're e.g. at 13:00h we don't add entries at 12:50h
+				if(nextEntry > date) {
+					let entry = CLKComplicationTimelineEntry(
+						date: nextEntry,
+						complicationTemplate: template)
+					
+					entries.append(entry)
+				}
+			}
 		}
 		
 		handler(entries)
@@ -83,14 +111,14 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		
 		handler(template)
 	}
-
+	
 	// MARK: - Sample Templates
 	
 	// Select the correct template based on the complication's family.
 	func createTemplate(
 		forComplication complication: CLKComplication,
 		date: Date) -> CLKComplicationTemplate
-		{
+	{
 		switch complication.family {
 			case .modularSmall:
 				return createModularSmallTemplate(forDate: date)
@@ -129,31 +157,44 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		let label = CLKSimpleTextProvider(text: Model.timepointasstring)
 		let actualValue = CLKSimpleTextProvider(text: Model.dayofweek)
 		print("ModularSmall "+Model.timepointasstring)
-	
+		
 		// Create the template using the providers.
 		return CLKComplicationTemplateModularSmallStackText(line1TextProvider: label,
 																												line2TextProvider: actualValue)
 	}
 	
+	// Return the fraction of the time left until breakfast
+	// starting at 3 hours before. E.g 2 hours before equals 0.33
+	// After the set time point we have 14 hours of fasting until we can eat breakfast again
+	// Let a countdown start 3 hours ahead because we might during weekend select to fast only 12 hours
+	func getFillFraction() -> Float {
+		let timeRemaining: TimeInterval = (14.0 * 60.0 * 60.0) - Date().timeIntervalSince(Model.timepointasdate)
+		var timeFraction: TimeInterval = 0.0
+		if timeRemaining > 3.0 { timeFraction = 0.0 }  // Still more than 3 hours left
+		else if timeRemaining < 0.0 { timeFraction = 1.0 } // Past breakfast time
+		else {
+			// At 3 hours before the fraction starts to rise from zero
+			// and it goes up to one at breakfast time
+			timeFraction = (3.0 - timeRemaining) / 3.0
+		}
+		return Float(timeFraction)
+	}
+	
 	// Return a graphic circle template.
 	func createGraphicCircleTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		
-		var timeRemaining: TimeInterval = 0.0
-		timeRemaining = (24.0 * 60.0 * 60.0) - Date().timeIntervalSince(Model.timepointasdate)
-		if timeRemaining > 1.0 { timeRemaining = 1.0 }
-		if timeRemaining < 0.0 { timeRemaining = 0.0 }
-		
-		// Create the data providers.
-			let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
-																								 gaugeColors: [.black, .darkGray, .lightGray, .white],
-																								 gaugeColorLocations: [0.0, 0.5, 0.75, 0.99] as [NSNumber],
-																								 fillFraction: Float(timeRemaining))
+		let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
+																							 gaugeColors: [.black, .darkGray, .lightGray, .white],
+																							 gaugeColorLocations: [0.01, 0.33, 0.66, 0.99] as [NSNumber],
+																							 fillFraction: (getFillFraction()))
 		
 		let atHour = CLKSimpleTextProvider(text: Model.timepointasstring)
+		
+		// Extract first two char's of week day e.g 'MO'
 		let t = Model.dayofweek
-		let dayofweek = CLKSimpleTextProvider(text: String(t[t.startIndex]) + String(t[t.index(after: t.startIndex)]))  // First two char's
+		let dayofweek = CLKSimpleTextProvider(text: String(t[t.startIndex]) + String(t[t.index(after: t.startIndex)]))
 		print("GraphicCircle " + Model.timepointasstring + " " + Model.dayofweek)
-
+		
 		// Create the template using the providers.
 		return CLKComplicationTemplateGraphicCircularOpenGaugeSimpleText(gaugeProvider: gaugeProvider,
 																																		 bottomTextProvider: atHour,
@@ -175,7 +216,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	// Return a graphic corner small template.
 	func createGraphicCornerTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		print("GraphicCornerStackText " + Model.timepointasstring)
-
+		
 		return CLKComplicationTemplateGraphicCornerStackText(
 			innerTextProvider: CLKSimpleTextProvider(text: Model.dayofweek),
 			outerTextProvider: CLKSimpleTextProvider(text: Model.timepointasstring) )
@@ -239,19 +280,13 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		let imageProvider = CLKFullColorImageProvider(fullColorImage: image!)
 		let titleTextProvider = CLKSimpleTextProvider(text: "  " + Model.timepointasstring + " " + Model.dayofweek)
 		let actualValue = CLKSimpleTextProvider(text: "")
-
+		
 		print("GraphicRectangular "+Model.timepointasstring)
 		
-		var timeRemaining: TimeInterval = 0.0
-		timeRemaining = (24.0 * 60.0 * 60.0) - Date().timeIntervalSince(Model.timepointasdate)
-		if timeRemaining > 1.0 { timeRemaining = 1.0 }
-		if timeRemaining < 0.0 { timeRemaining = 0.0 }
-		
-		// Create the data providers.
 		let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
-																							gaugeColors: [.black, .darkGray, .lightGray, .white],
-																							gaugeColorLocations: [0.0, 0.5, 0.75, 0.99] as [NSNumber],
-																							fillFraction: (1.0 - Float(timeRemaining)))
+																							 gaugeColors: [.black, .darkGray, .lightGray, .white],
+																							 gaugeColorLocations: [0.01, 0.33, 0.66, 0.99] as [NSNumber],
+																							 fillFraction: (getFillFraction()))
 		
 		return CLKComplicationTemplateGraphicRectangularTextGauge(headerImageProvider: imageProvider,
 																															headerTextProvider: titleTextProvider,
@@ -261,7 +296,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	
 	// Return a circular template with text that wraps around the top of the watch's bezel.
 	func createGraphicBezelTemplate(forDate date: Date) -> CLKComplicationTemplate {
-
+		
 		// Create a graphic circular template with an image provider
 		let image = UIImage(named: "55x55")
 		let circle = CLKComplicationTemplateGraphicCircularImage(
@@ -276,7 +311,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	
 	// Returns an extra large graphic template.
 	func createGraphicExtraLargeTemplate(forDate date: Date) -> CLKComplicationTemplate {
-				
+		
 		print("GraphicExtraLarge "+Model.timepointasstring)
 		
 		return CLKComplicationTemplateExtraLargeStackText(
