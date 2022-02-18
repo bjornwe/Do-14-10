@@ -3,13 +3,16 @@
 //  Do_10-14 WatchKit Extension
 //
 //  Created by bjorn on 2022-01-20.
+//  See https://developer.apple.com/documentation/clockkit/creating_and_updating_a_complication_s_timeline
 //
 
 import ClockKit
 import SwiftUI
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
-	var model = Model.shared
+	//var model = Model.shared
+	let oneHour: TimeInterval = 3600.0 // seconds
+	let fourteenHours: TimeInterval = 14.0 * 3600.0 // Modify this to eg one hour to easier debug its function
 	
 	// MARK: - Complication Configuration
 	
@@ -17,12 +20,14 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		// Call the handler with the last entry date you can currently provide or nil if you can't support future timelines
 		
 		// Define how far into the future the app can provide data.
-		let pastNextBreakfast: Date = Model.timepointasdate + (14.02 * 60.0 * 60.0)
+		let pastNextBreakfast: Date = Model.timepointasdate + fourteenHours
+		print("getTimelineEndDate pastNextBreakfast " + DateFormatter.short.string(from: pastNextBreakfast))
 		handler(pastNextBreakfast) //.distantFuture)
 	}
 	
 	func getTimelineStartDate(for complication: CLKComplication, withHandler handler: @escaping (Date?) -> Void) {
-		let approachingBreakfast: Date = Model.timepointasdate + (10.98 * 60.0 * 60.0)
+		let approachingBreakfast: Date = Model.timepointasdate + (10.98 * oneHour)
+		print("getTimelineStartDate approachingBreakfast " + DateFormatter.short.string(from: approachingBreakfast))
 		handler(approachingBreakfast)
 	}
 	
@@ -36,7 +41,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		//let myDictionary = ["timepoint":timepointasstring]
 		let descriptors = [
 			CLKComplicationDescriptor(
-				identifier: "Do_14/10",
+				identifier: "Do-14/10",
 				displayName: "14/10",
 				supportedFamilies: CLKComplicationFamily.allCases
 			)
@@ -46,45 +51,33 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	}
 	
 	// Return the current timeline entry
+	// "For the current timeline entry, you must specify a date equal to or earlier than the current time."
 	func getCurrentTimelineEntry(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
 		
-		var nextTime: Date
-		let timeRemaining: TimeInterval = (14.0 * 60.0 * 60.0) - Date().timeIntervalSince(Model.timepointasdate)
-		if timeRemaining > 3.0 { nextTime = Model.timepointasdate + (11.0 * 60.0 * 60.0) }  // Still less than 11 hours of fasting
-		else if timeRemaining < 0.0 { nextTime = .distantFuture } // Past breakfast time
-		else {
-			// After 11 hours fasting we need to update every 10 minutes
-			var dateNextIteration: Date = Model.timepointasdate + (11.0 * 60.0 * 60.0) + (10.0 * 60.0)
-			while (Date() > dateNextIteration) {
-				dateNextIteration = dateNextIteration + (10.0 * 60.0)
-			}
-			nextTime = dateNextIteration
-		}
-		
-		let template = createTemplate(forComplication: complication, date: nextTime)
+		let nextTimelineEntry: Date = Date() - 1.0
+		let template = createTemplate(forComplication: complication, date: nextTimelineEntry)
 		let entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: template)
+		print("getCurrentTimelineEntry nextTimelineEntry " + DateFormatter.short.string(from: nextTimelineEntry))
 		handler(entry)
 	}
 	
-	// Return future timeline entries.
+	// Batch load future timeline entries
 	func getTimelineEntries(for complication: CLKComplication, after date: Date, limit: Int, withHandler handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
-		
+		print("getTimelineEntries"
+					+ " after " + DateFormatter.short.string(from: date)
+					+ " limit " + String(limit))
+
 		// Call the handler with the timeline entries after the given date
 		let template = createTemplate(forComplication: complication, date: date)
 		var entries: [CLKComplicationTimelineEntry] = []  // Create an array to hold the timeline entries.
-		var nextEntry: Date
-		let timeRemaining: TimeInterval = (14.0 * 60.0 * 60.0) - date.timeIntervalSince(Model.timepointasdate)
 		
-		if timeRemaining < 0.0 {   // Past breakfast time
-			nextEntry = .distantFuture
-		}
-		else {
-		  nextEntry = Model.timepointasdate + (11.0 * 60.0 * 60.0)
+		let timeFasting: TimeInterval = Date().timeIntervalSince(Model.timepointasdate)
+		
+		if timeFasting < fourteenHours {
+			var nextEntry: Date = Model.timepointasdate + fourteenHours - (3.0 * oneHour)
 			
-			// After 11:00 hours we need to update every 10 minutes for three hours (if limit so permits)
-			for i in 0...min(18,limit) {
-				nextEntry = nextEntry + (Double(i) * 60.0)
-				
+			// Three hours before breakfast we need to updates every 20 minutes for three hours (if limit so permits)
+			for _ in 0...min(9,limit) {
 				// Don't add entries in the past
 				// If we're e.g. at 13:00h we don't add entries at 12:50h
 				if(nextEntry > date) {
@@ -92,8 +85,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 						date: nextEntry,
 						complicationTemplate: template)
 					
+					print("getTimelineEntries nextEntry " + DateFormatter.short.string(from: nextEntry))
 					entries.append(entry)
 				}
+				nextEntry = nextEntry + (20.0 * 60.0) // 20 minutes
 			}
 		}
 		
@@ -105,9 +100,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		
 		// Calculate the date 49 hours from now.
 		// Since it's more than 48 hours in the future,
-		// Our template will always show zero cups and zero mg caffeine.
-		let future = Date().addingTimeInterval(49.0 * 60.0 * 60.0)
+		let future = Date().addingTimeInterval(49.0 * oneHour)
 		let template = createTemplate(forComplication: complication, date: future)
+		print("getLocalizableSampleTemplate future " + DateFormatter.short.string(from: future))
 		
 		handler(template)
 	}
@@ -156,7 +151,6 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		// Create the data providers.
 		let label = CLKSimpleTextProvider(text: Model.timepointasstring)
 		let actualValue = CLKSimpleTextProvider(text: Model.dayofweek)
-		print("ModularSmall "+Model.timepointasstring)
 		
 		// Create the template using the providers.
 		return CLKComplicationTemplateModularSmallStackText(line1TextProvider: label,
@@ -168,16 +162,17 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	// After the set time point we have 14 hours of fasting until we can eat breakfast again
 	// Let a countdown start 3 hours ahead because we might during weekend select to fast only 12 hours
 	func getFillFraction() -> Float {
-		let timeRemaining: TimeInterval = (14.0 * 60.0 * 60.0) - Date().timeIntervalSince(Model.timepointasdate)
-		var timeFraction: TimeInterval = 0.0
-		if timeRemaining > 3.0 { timeFraction = 0.0 }  // Still more than 3 hours left
-		else if timeRemaining < 0.0 { timeFraction = 1.0 } // Past breakfast time
+		let timeRemaining: TimeInterval = fourteenHours - Date().timeIntervalSince(Model.timepointasdate)
+		var timeFraction: Float
+		if timeRemaining > (3.0 * oneHour) { timeFraction = 0.0 }  // Still more than 3h left to breakfast
+		else if timeRemaining < (-1.0 * oneHour) { timeFraction = 0.0 } // >1h past breakfast time
+		else if timeRemaining < 0.0 { timeFraction = 1.0 } // 0 to 1h past breakfast time
 		else {
 			// At 3 hours before the fraction starts to rise from zero
 			// and it goes up to one at breakfast time
-			timeFraction = (3.0 - timeRemaining) / 3.0
+			timeFraction = Float(((3.0 * oneHour) - timeRemaining) / (3.0 * oneHour))
 		}
-		return Float(timeFraction)
+		return timeFraction
 	}
 	
 	// Return a graphic circle template.
@@ -314,8 +309,20 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		
 		print("GraphicExtraLarge "+Model.timepointasstring)
 		
-		return CLKComplicationTemplateExtraLargeStackText(
+		return CLKComplicationTemplateGraphicExtraLargeCircularStackText(
 			line1TextProvider: CLKSimpleTextProvider(text: Model.timepointasstring),
 			line2TextProvider: CLKSimpleTextProvider (text: Model.dayofweek))
 	}
+}
+
+// https://sarunw.com/posts/how-to-use-dateformatter/
+extension DateFormatter {
+	static let short: DateFormatter = {
+		let df = DateFormatter()
+		df.dateFormat = "y-MM-dd E HH:mm"
+		/* df.dateStyle = .short
+		df.timeStyle = .short
+		df.locale = Locale.autoupdatingCurrent */
+		return df
+	}()
 }

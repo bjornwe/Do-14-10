@@ -14,14 +14,14 @@ struct ContentView: View {
 		
 		VStack {
 			HStack {
-				Button("-10 min") { model.setTimepointasdate(new: Model.timepointasdate - 600)}
-				Button("+10 min") { model.setTimepointasdate(new: Model.timepointasdate + 600)}
+				Button("-10 min") { model.setTimepointasdate(newDate: Model.timepointasdate - 600)}
+				Button("+10 min") { model.setTimepointasdate(newDate: Model.timepointasdate + 600)}
 			}
 			.buttonStyle(.bordered)
 			
-			Text(model.weekdayinstancestring + " " + model.timepointinstancestring).font(.title)
+			Text(model.timepointinstancestring + " " + model.dayofweekinstancestring).font(.title)
 			
-			Button("Now") { model.setTimepointasdate(new: Date())}
+			Button("Now") { model.setTimepointasdate(newDate: Date())}
 		}
 	}
 }

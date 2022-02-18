@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct Do_14_10App: App {
 	
-	@StateObject var model = Model.shared
+	//@StateObject var model = Model.shared
 	
 	var body: some Scene {
 		WindowGroup {

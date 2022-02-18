@@ -10,7 +10,7 @@ import ClockKit
 
 //@MainActor
 class Model: ObservableObject {
-	static let shared = Model()
+	//static let shared = Model()
 	
 	// Static variables
 	static var timepointasstring: String = "xx:yy" // Used in ComplicationController to auto-update complication
@@ -19,43 +19,51 @@ class Model: ObservableObject {
 	
 	// Instance variable
 	@Published var timepointinstancestring: String = "xx:yy"  // Used to auto-update ContentView
-	@Published var weekdayinstancestring: String = ""
+	@Published var dayofweekinstancestring: String = ""
+	@Published var timepointinstanceasdate: Date = Date()
 	
 	init() {
 		print("Model init")
 		
 		// Load from files
 		self.timepointinstancestring = self.fetchfromfile(filename: "timepoint.txt")
-		self.weekdayinstancestring = self.fetchfromfile(filename: "dayofweek.txt")
+		self.dayofweekinstancestring = self.fetchfromfile(filename: "dayofweek.txt")
+		let loadedDate = self.fetchfromfile(filename: "date.txt")
+
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = "y-MM-dd E HH:mm" // Must match DateFormatter.short.dateFormat property
+		self.timepointinstanceasdate = dateFormatter.date(from: loadedDate) ?? Date()
 		
 		// Copy from instance to static variables
 		Model.timepointasstring = self.timepointinstancestring
-		Model.dayofweek = self.weekdayinstancestring
+		Model.dayofweek = self.dayofweekinstancestring
+		Model.timepointasdate = self.timepointinstanceasdate
 		
 		Task.detached {
 			await self.updateComplications()
 		}
 	}
 	
-	public func setTimepointasdate(new: Date)  -> Void
+	public func setTimepointasdate(newDate: Date)  -> Void
 	{
-		Model.timepointasdate = new
+		Model.timepointasdate = newDate
 		
 		// Set static variables
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "HH:mm"
-		Model.timepointasstring = dateFormatter.string(from: new)
+		Model.timepointasstring = dateFormatter.string(from: newDate)
 		
 		dateFormatter.dateFormat = "E"
-		Model.dayofweek = dateFormatter.string(from: new)
+		Model.dayofweek = dateFormatter.string(from: newDate)
 		
 		// Set instance variables
 		self.timepointinstancestring = Model.timepointasstring
-		self.weekdayinstancestring = Model.dayofweek
+		self.dayofweekinstancestring = Model.dayofweek
 
 		// Store to files
 		self.storetofile(filename: "timepoint.txt", value: Model.timepointasstring)
 		self.storetofile(filename: "dayofweek.txt", value: Model.dayofweek)
+		self.storetofile(filename: "date.txt", value: DateFormatter.short.string(from: newDate))
 
 		Task.detached {
 			await self.updateComplications()
@@ -92,30 +100,25 @@ class Model: ObservableObject {
 			for: .documentDirectory,
 			in: .userDomainMask).first
 		{
-			
 			let pathWithFilename = documentDirectory.appendingPathComponent(filename)
 			
-			do
-			{
-				value = try String(contentsOf: pathWithFilename, encoding: .utf8)
-			}
-			catch
-			{
-				print("fetchfromfile got ERR 2")
-			}
+			do { value = try String(contentsOf: pathWithFilename, encoding: .utf8) }
+			catch { }
 		}
-		
-		print(filename + " contained " + value)
+		print("fetchfromfile " + filename + " got " + value)
 		return value
 	}
 	
 	// Asynchronously update any active complications
 	private func updateComplications() async {
 		// Update any complications on active watch faces.
+		print("updateComplications")
+		
 		let server = CLKComplicationServer.sharedInstance()
 		let complications = await server.getActiveComplications()
 		
 		for complication in complications {
+			print("updateComplication " + complication.description)
 			server.reloadTimeline(for: complication)
 		}
 	}
