@@ -25,13 +25,24 @@ class Model: ObservableObject {
 		print("Model init")
 		
 		// Load from files
-		self.timepointinstancestring = self.fetchfromfile(filename: "timepoint.txt")
-		self.dayofweekinstancestring = self.fetchfromfile(filename: "dayofweek.txt")
-		let loadedDate = self.fetchfromfile(filename: "date.txt")
-
-		let dateFormatter = DateFormatter()
-		dateFormatter.dateFormat = "y-MM-dd E HH:mm" // Must match DateFormatter.short.dateFormat property
-		self.timepointinstanceasdate = dateFormatter.date(from: loadedDate) ?? Date()
+		let storedtimepointasstring = self.fetchfromfile(filename: "timepoint.txt")
+		
+		if(storedtimepointasstring == "ERR 2") // File not initialized
+		{
+			self.timepointinstancestring = "Not"
+			self.dayofweekinstancestring = "set"
+			self.timepointinstanceasdate = Date.distantPast
+		}
+		else
+		{
+			self.timepointinstancestring = storedtimepointasstring
+			self.dayofweekinstancestring = self.fetchfromfile(filename: "dayofweek.txt")
+			
+			let loadedDate = self.fetchfromfile(filename: "date.txt")
+			let dateFormatter = DateFormatter()
+			dateFormatter.dateFormat = "y-MM-dd E HH:mm" // Must match DateFormatter.short.dateFormat property
+			self.timepointinstanceasdate = dateFormatter.date(from: loadedDate) ?? Date()
+		}
 		
 		// Copy from instance to static variables
 		Model.timepointasstring = self.timepointinstancestring
