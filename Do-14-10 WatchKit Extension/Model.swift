@@ -10,7 +10,6 @@ import ClockKit
 
 //@MainActor
 class Model: ObservableObject {
-	//static let shared = Model()
 	
 	// Static variables
 	static var timepointasstring: String = "xx:yy" // Used in ComplicationController to auto-update complication
@@ -46,9 +45,9 @@ class Model: ObservableObject {
 	
 	public func setTimepointasdate(newDate: Date)  -> Void
 	{
+		// Set static variables
 		Model.timepointasdate = newDate
 		
-		// Set static variables
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "HH:mm"
 		Model.timepointasstring = dateFormatter.string(from: newDate)
@@ -59,7 +58,8 @@ class Model: ObservableObject {
 		// Set instance variables
 		self.timepointinstancestring = Model.timepointasstring
 		self.dayofweekinstancestring = Model.dayofweek
-
+		self.timepointinstanceasdate = Model.timepointasdate
+		
 		// Store to files
 		self.storetofile(filename: "timepoint.txt", value: Model.timepointasstring)
 		self.storetofile(filename: "dayofweek.txt", value: Model.dayofweek)
@@ -74,14 +74,13 @@ class Model: ObservableObject {
 	{
 		if let documentDirectory = FileManager.default.urls(
 			for: .documentDirectory,
-				 in: .userDomainMask).first
+			in: .userDomainMask).first
 		{
-			print(filename + " is set to " + value)
-			
 			let pathWithFilename = documentDirectory.appendingPathComponent(filename)
 			do
 			{
 				try value.write(to: pathWithFilename, atomically: false, encoding: .utf8)
+				print(filename + " is set to " + value)
 			}
 			catch
 			{
@@ -101,11 +100,16 @@ class Model: ObservableObject {
 			in: .userDomainMask).first
 		{
 			let pathWithFilename = documentDirectory.appendingPathComponent(filename)
-			
-			do { value = try String(contentsOf: pathWithFilename, encoding: .utf8) }
-			catch { }
+			do
+			{
+				value = try String(contentsOf: pathWithFilename, encoding: .utf8)
+				print("fetchfromfile " + filename + " got " + value)
+			}
+			catch
+			{
+				print("fetchfromfile got ERR 2")
+			}
 		}
-		print("fetchfromfile " + filename + " got " + value)
 		return value
 	}
 	
@@ -135,7 +139,11 @@ extension CLKComplicationServer {
 			let center = NotificationCenter.default
 			let mainQueue = OperationQueue.main
 			var token: NSObjectProtocol?
-			token = center.addObserver(forName: .CLKComplicationServerActiveComplicationsDidChange, object: nil, queue: mainQueue) { _ in
+			token = center.addObserver(
+				forName: .CLKComplicationServerActiveComplicationsDidChange,
+				object: nil,
+				queue: mainQueue)
+			{ _ in
 				center.removeObserver(token!)
 				continuation.resume(returning: self.activeComplications!)
 			}
@@ -144,7 +152,9 @@ extension CLKComplicationServer {
 			if activeComplications != nil {
 				center.removeObserver(token!)
 				continuation.resume(returning: self.activeComplications!)
+				print("getActiveComplications was not nil")
 			}
+			else { print("getActiveComplications was nil") }
 		}
 	}
 }
