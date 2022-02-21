@@ -28,8 +28,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
 	static var previews: some View {
-		//let cc: ComplicationController = ComplicationController()
-		
 		Group {  // Max 10 items in group
 			//ComplicationController().createModularSmallTemplate(forDate: Date()).previewContext()
 			//ComplicationController().createGraphicCircleTemplate(forDate: Date()).previewContext()
