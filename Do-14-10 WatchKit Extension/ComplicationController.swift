@@ -10,39 +10,34 @@ import ClockKit
 import SwiftUI
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
-	//var model = Model.shared
 	let oneHour: TimeInterval = 3600.0 // seconds
+	let elevenHours: TimeInterval = 11.0 * 3600.0
 	let fourteenHours: TimeInterval = 14.0 * 3600.0 // Modify this to eg one hour to easier debug its function
 	
-	// MARK: - Complication Configuration
-	
+	// Call the handler with the last entry date you can currently provide or nil if you can't support future timelines
+	// Define how far into the future the app can provide data.
 	func getTimelineEndDate(for complication: CLKComplication, withHandler handler: @escaping (Date?) -> Void) {
-		// Call the handler with the last entry date you can currently provide or nil if you can't support future timelines
-		
-		// Define how far into the future the app can provide data.
 		let pastNextBreakfast: Date = Model.timepointasdate + fourteenHours
 		print("getTimelineEndDate pastNextBreakfast " + DateFormatter.short.string(from: pastNextBreakfast))
 		handler(pastNextBreakfast) //.distantFuture)
 	}
 	
 	func getTimelineStartDate(for complication: CLKComplication, withHandler handler: @escaping (Date?) -> Void) {
-		let approachingBreakfast: Date = Model.timepointasdate + (10.98 * oneHour)
+		let approachingBreakfast: Date = Model.timepointasdate + elevenHours
 		print("getTimelineStartDate approachingBreakfast " + DateFormatter.short.string(from: approachingBreakfast))
 		handler(approachingBreakfast)
 	}
 	
+	// Call the handler with your desired behavior when the device is locked
 	func getPrivacyBehavior(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationPrivacyBehavior) -> Void) {
-		// Call the handler with your desired behavior when the device is locked
-		
 		handler(.showOnLockScreen)
 	}
 	
 	func getComplicationDescriptors(handler: @escaping ([CLKComplicationDescriptor]) -> Void) {
-		//let myDictionary = ["timepoint":timepointasstring]
 		let descriptors = [
 			CLKComplicationDescriptor(
-				identifier: "Do-14/10",
-				displayName: "14/10",
+				identifier: "I.F.14/10",
+				displayName: "I.F.14/10",
 				supportedFamilies: CLKComplicationFamily.allCases
 			)
 		]
@@ -74,7 +69,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		let timeFasting: TimeInterval = Date().timeIntervalSince(Model.timepointasdate)
 		
 		if timeFasting < fourteenHours {
-			var nextEntry: Date = Model.timepointasdate + fourteenHours - (3.0 * oneHour)
+			var nextEntry: Date = Model.timepointasdate + elevenHours
 			
 			// Three hours before breakfast we need to updates every 20 minutes for three hours (if limit so permits)
 			for _ in 0...min(9,limit) {
@@ -98,16 +93,13 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	func getLocalizableSampleTemplate(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
 		// This method will be called once per supported complication, and the results will be cached
 		
-		// Calculate the date 49 hours from now.
-		// Since it's more than 48 hours in the future,
-		let future = Date().addingTimeInterval(49.0 * oneHour)
+		// Calculate the date 14 + 3 hours from now.
+		let future = Date().addingTimeInterval(fourteenHours + (3.0 * oneHour))
 		let template = createTemplate(forComplication: complication, date: future)
 		print("getLocalizableSampleTemplate future " + DateFormatter.short.string(from: future))
 		
 		handler(template)
 	}
-	
-	// MARK: - Sample Templates
 	
 	// Select the correct template based on the complication's family.
 	func createTemplate(
@@ -140,7 +132,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 				return createGraphicExtraLargeTemplate(forDate: date)
 				
 			default:
-				return createModularSmallTemplate(forDate: date) // Try the small one anyway
+				return createModularSmallTemplate(forDate: date) // Try the small one as last resort
 		}
 	}
 	
@@ -162,15 +154,15 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	// After the set time point we have 14 hours of fasting until we can eat breakfast again
 	// Let a countdown start 3 hours ahead because we might during weekend select to fast only 12 hours
 	func getFillFraction() -> Float {
-		let timeRemaining: TimeInterval = fourteenHours - Date().timeIntervalSince(Model.timepointasdate)
 		var timeFraction: Float
-		if timeRemaining > (3.0 * oneHour) { timeFraction = 0.0 }  // Still more than 3h left to breakfast
-		else if timeRemaining < (-1.0 * oneHour) { timeFraction = 0.0 } // >1h past breakfast time
-		else if timeRemaining < 0.0 { timeFraction = 1.0 } // 0 to 1h past breakfast time
+		let timeFasting: TimeInterval = Date().timeIntervalSince(Model.timepointasdate)
+				
+		// At 3 hours before breakfast the time fraction starts to rise from zero
+		// and it goes up to one at breakfast time
+		if (timeFasting < elevenHours) { timeFraction = 0.0 }
+		else if (timeFasting > fourteenHours) { timeFraction = 1.0 }
 		else {
-			// At 3 hours before the fraction starts to rise from zero
-			// and it goes up to one at breakfast time
-			timeFraction = Float(((3.0 * oneHour) - timeRemaining) / (3.0 * oneHour))
+			timeFraction = Float((timeFasting - elevenHours) / ( 3.0 * oneHour))
 		}
 		return timeFraction
 	}
@@ -320,9 +312,6 @@ extension DateFormatter {
 	static let short: DateFormatter = {
 		let df = DateFormatter()
 		df.dateFormat = "y-MM-dd E HH:mm"
-		/* df.dateStyle = .short
-		df.timeStyle = .short
-		df.locale = Locale.autoupdatingCurrent */
 		return df
 	}()
 }
