@@ -36,8 +36,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	func getComplicationDescriptors(handler: @escaping ([CLKComplicationDescriptor]) -> Void) {
 		let descriptors = [
 			CLKComplicationDescriptor(
-				identifier: "I.F.14/10",
-				displayName: "I.F.14/10",
+				identifier: "Do 14/10",
+				displayName: "Do 14/10",
 				supportedFamilies: CLKComplicationFamily.allCases
 			)
 		]
@@ -149,10 +149,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 																												line2TextProvider: actualValue)
 	}
 	
-	// Return the fraction of the time left until breakfast
-	// starting at 3 hours before. E.g 2 hours before equals 0.33
-	// After the set time point we have 14 hours of fasting until we can eat breakfast again
-	// Let a countdown start 3 hours ahead because we might during weekend select to fast only 12 hours
+	// After setting a time point we have 14 hours of fasting until we can eat breakfast again
+	// We want to know when we are approaching breakfast.
+	// Start notifying at 3 hours before so e.g 2 hours before equals 0.33
+	// 3 hours ahead is chosen because during weekend we might select to fast only 12 hours
 	func getFillFraction() -> Float {
 		var timeFraction: Float
 		let timeFasting: TimeInterval = Date().timeIntervalSince(Model.timepointasdate)
@@ -160,6 +160,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		// At 3 hours before breakfast the time fraction starts to rise from zero
 		// and it goes up to one at breakfast time
 		if (timeFasting < elevenHours) { timeFraction = 0.0 }
+		else if (timeFasting > (fourteenHours + oneHour + oneHour)) { timeFraction = 0.0 } // At 2h after breakfast we skip the reminder
 		else if (timeFasting > fourteenHours) { timeFraction = 1.0 }
 		else {
 			timeFraction = Float((timeFasting - elevenHours) / ( 3.0 * oneHour))
