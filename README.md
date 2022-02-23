@@ -6,7 +6,7 @@ When I finish my evening meal at maybe 6pm I click the complication on the watch
 then I press Now in the app view. Optionally I can add och subtract in 10 minutes steps. 
 Also optionally I can rotate the crown to add or subtract hours.
 The app helps me to remember when my 14 hours of fasting is over - in this case at 8am.
-This time point is, as well as the day of week, shown by the complication.
+The "Now" time point and the day of week is shown by the complication.
 
 The challenges for me was to learn Xcode and Swift and also to understand the AppleWatch 
 libraries. I am coming from the C# world and I must say that pushing the app to
