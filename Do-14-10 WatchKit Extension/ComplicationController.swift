@@ -45,14 +45,30 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		handler(descriptors)
 	}
 	
-	// Return the current timeline entry
+	// Return the current timeline entry i.e. last one before current time
 	// "For the current timeline entry, you must specify a date equal to or earlier than the current time."
 	func getCurrentTimelineEntry(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
+		let timeFasting: TimeInterval = Date().timeIntervalSince(Model.timepointasdate)
+				
+		// Three hours before breakfast we create timeline entries every 20 minutes for three hours
+		var i = 0;
+		var nextEntry: Date = Model.timepointasdate + elevenHours
+		while (i < 9) {
+			// Is next timeline entry later than current timeFasting then hold at this entry
+			if ((nextEntry + 20.0 * 60.0) > (Model.timepointasdate + timeFasting)) {
+				break
+			}
+			i = i + 1
+			nextEntry = nextEntry + (20.0 * 60.0) // 20 minutes
+		}
 		
-		let nextTimelineEntry: Date = Date() - 1.0
-		let template = createTemplate(forComplication: complication, date: nextTimelineEntry)
-		let entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: template)
-		print("getCurrentTimelineEntry nextTimelineEntry " + DateFormatter.short.string(from: nextTimelineEntry))
+		let template = createTemplate(forComplication: complication, date: nextEntry)
+		let entry = CLKComplicationTimelineEntry(
+			date: nextEntry,
+			complicationTemplate: template)
+		
+		print("getCurrentTimelineEntry nextEntry " + DateFormatter.short.string(from: nextEntry))
+
 		handler(entry)
 	}
 	
