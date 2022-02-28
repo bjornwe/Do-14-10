@@ -68,8 +68,8 @@ struct ContentView_Previews: PreviewProvider {
 			//ComplicationController().createUtilitarianSmallFlatTemplate(forDate: Date()).previewContext()
 			//ComplicationController().createUtilitarianLargeTemplate(forDate: Date()).previewContext()
 			//ComplicationController().createExtraLargeTemplate(forDate: Date()).previewContext()
-			ComplicationController().createGraphicRectangularTemplate(forDate: Date()).previewContext()
-			ComplicationController().createGraphicBezelTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createGraphicRectangularTemplate(forDate: Date()).previewContext()
+			//ComplicationController().createGraphicBezelTemplate(forDate: Date()).previewContext()
 			ComplicationController().createGraphicExtraLargeTemplate(forDate: Date()).previewContext()
 		}
 	}

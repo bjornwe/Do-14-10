@@ -48,7 +48,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	// Return the current timeline entry i.e. last one before current time
 	// "For the current timeline entry, you must specify a date equal to or earlier than the current time."
 	func getCurrentTimelineEntry(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
-		let timeFasting: TimeInterval = Date().timeIntervalSince(Model.timepointasdate)
+		let nextEntry: Date = Date()
+		
+		/*let timeFasting: TimeInterval = Date().timeIntervalSince(Model.timepointasdate)
 				
 		// Three hours before breakfast we create timeline entries every 20 minutes for three hours
 		var i = 0;
@@ -60,7 +62,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 			}
 			i = i + 1
 			nextEntry = nextEntry + (20.0 * 60.0) // 20 minutes
-		}
+		}*/
 		
 		let template = createTemplate(forComplication: complication, date: nextEntry)
 		let entry = CLKComplicationTimelineEntry(
@@ -84,11 +86,11 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		
 		let timeFasting: TimeInterval = Date().timeIntervalSince(Model.timepointasdate)
 		
-		if timeFasting < fourteenHours {
+		if timeFasting < (fourteenHours+oneHour+oneHour) {
 			var nextEntry: Date = Model.timepointasdate + elevenHours
 			
-			// Three hours before breakfast we need to updates every 20 minutes for three hours (if limit so permits)
-			for _ in 0...min(9,limit) {
+			// Three hours before breakfast we need to updates every 15 minutes for three hours (if limit so permits)
+			for _ in 0...min(12,limit) {
 				// Don't add entries in the past
 				// If we're e.g. at 13:00h we don't add entries at 12:50h
 				if(nextEntry > date) {
@@ -99,7 +101,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 					print("getTimelineEntries nextEntry " + DateFormatter.short.string(from: nextEntry))
 					entries.append(entry)
 				}
-				nextEntry = nextEntry + (20.0 * 60.0) // 20 minutes
+				nextEntry = nextEntry + (15.0 * 60.0) // 15 minutes
 			}
 		}
 		
@@ -110,7 +112,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		// This method will be called once per supported complication, and the results will be cached
 		
 		// Calculate the date 14 + 3 hours from now.
-		let future = Date().addingTimeInterval(fourteenHours + (3.0 * oneHour))
+		let future = Model.timepointasdate + fourteenHours
 		let template = createTemplate(forComplication: complication, date: future)
 		print("getLocalizableSampleTemplate future " + DateFormatter.short.string(from: future))
 		
@@ -288,8 +290,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 		print("GraphicRectangular "+Model.timepointasstring)
 		
 		let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
-																							 gaugeColors: [.black, .darkGray, .lightGray, .white],
-																							 gaugeColorLocations: [0.01, 0.33, 0.66, 0.99] as [NSNumber],
+																							 gaugeColors: [.black, .red, .orange, .yellow, .green],
+																							 gaugeColorLocations: [0.0, 0.01, 0.33, 0.66, 1.0] as [NSNumber],
 																							 fillFraction: (getFillFraction()))
 		
 		return CLKComplicationTemplateGraphicRectangularTextGauge(headerImageProvider: imageProvider,
