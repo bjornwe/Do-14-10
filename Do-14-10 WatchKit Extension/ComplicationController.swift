@@ -190,10 +190,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	func createGraphicCircleTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		
 		let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
-																							 gaugeColors: [.black, .darkGray, .lightGray, .white],
-																							 gaugeColorLocations: [0.01, 0.33, 0.66, 0.99] as [NSNumber],
+																							 gaugeColors: [.black, .red, .orange, .yellow, .green],
+																							 gaugeColorLocations: [0.0, 0.01, 0.33, 0.66, 1.0] as [NSNumber],
 																							 fillFraction: (getFillFraction()))
-		
+
 		let atHour = CLKSimpleTextProvider(text: Model.timepointasstring)
 		
 		// Extract first two char's of week day e.g 'MO'
@@ -280,6 +280,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	}
 	
 	// Return a large rectangular graphic template.
+	// Colored bar across screen
 	func createGraphicRectangularTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let image = UIImage(named: "55x55")
