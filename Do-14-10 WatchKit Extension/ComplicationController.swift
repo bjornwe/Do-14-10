@@ -189,22 +189,27 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	// Return a graphic circle template.
 	func createGraphicCircleTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		
+		// Put weekday on the circle as 1 to 7
+		// https://stackoverflow.com/questions/25533147/get-day-of-week-using-nsdate
+		let dayOfWeek = Calendar.current.component(.weekday, from: Model.timepointasdate)
+		
 		let gaugeProvider = CLKSimpleGaugeProvider(style: .fill,
 																							 gaugeColors: [.black, .red, .orange, .yellow, .green],
 																							 gaugeColorLocations: [0.0, 0.01, 0.33, 0.66, 1.0] as [NSNumber],
-																							 fillFraction: (getFillFraction()))
+																							 fillFraction: Float(dayOfWeek) / 7.0) //(getFillFraction()))
 
-		let atHour = CLKSimpleTextProvider(text: Model.timepointasstring)
-		
-		// Extract first two char's of week day e.g 'MO'
-		let t = Model.dayofweek
-		let dayofweek = CLKSimpleTextProvider(text: String(t[t.startIndex]) + String(t[t.index(after: t.startIndex)]))
+		// Put minute mm in the bottom
+		let minute = CLKSimpleTextProvider(text: String(Model.timepointasstring.suffix(2)))
+
+		// Put hour hh in the middle
+		let hh = Model.timepointasstring
+		let hour = CLKSimpleTextProvider(text: String(hh[hh.startIndex]) + String(hh[hh.index(after: hh.startIndex)]))
 		print("GraphicCircle " + Model.timepointasstring + " " + Model.dayofweek)
 		
 		// Create the template using the providers.
 		return CLKComplicationTemplateGraphicCircularOpenGaugeSimpleText(gaugeProvider: gaugeProvider,
-																																		 bottomTextProvider: atHour,
-																																		 centerTextProvider: dayofweek)
+																																		 bottomTextProvider: minute,
+																																		 centerTextProvider: hour)
 	}
 	
 	// Return a circular small template.
@@ -231,8 +236,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	// Return a modular large template.
 	func createModularLargeTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
-		let titleTextProvider = CLKSimpleTextProvider(text: Model.timepointasstring)
-		let actualValue = CLKSimpleTextProvider(text: Model.dayofweek)
+		let titleTextProvider = CLKSimpleTextProvider(text: "  " + Model.timepointasstring + "  " + Model.dayofweek)
+		let actualValue = CLKSimpleTextProvider(text: "")
 		print("ModularLarge "+Model.timepointasstring)
 		
 		// Create the template using the providers.
@@ -259,7 +264,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 	func createUtilitarianLargeTemplate(forDate date: Date) -> CLKComplicationTemplate {
 		// Create the data providers.
 		let flatUtilitarianImageProvider = CLKImageProvider(onePieceImage: UIImage(named: "55x55")!)
-		let actualValue = CLKSimpleTextProvider(text: Model.timepointasstring + " " + Model.dayofweek)
+		let actualValue = CLKSimpleTextProvider(text: "  " + Model.timepointasstring + " " + Model.dayofweek)
 		print("UtilitarianLarge "+Model.timepointasstring)
 		
 		// Create the template using the providers.

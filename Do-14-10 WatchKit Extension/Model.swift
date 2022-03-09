@@ -12,13 +12,13 @@ import ClockKit
 class Model: ObservableObject {
 	
 	// Static variables
-	static var timepointasstring: String = "..." // Used in ComplicationController to auto-update complication
-	static var dayofweek: String = ""
+	static var timepointasstring: String = "Not" // Used in ComplicationController to auto-update complication
+	static var dayofweek: String = "set"
 	static var timepointasdate: Date = Date()
 	
 	// Instance variable
-	@Published var timepointinstancestring: String = "..."  // Used to auto-update ContentView
-	@Published var dayofweekinstancestring: String = ""
+	@Published var timepointinstancestring: String = "Not" // Used to auto-update ContentView
+	@Published var dayofweekinstancestring: String = "set"
 	@Published var timepointinstanceasdate: Date = Date()
 	
 	init() {

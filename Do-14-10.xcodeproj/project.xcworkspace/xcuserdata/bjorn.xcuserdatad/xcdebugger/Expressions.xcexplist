@@ -3,17 +3,6 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "closure #1 in ContentView.body.getter:ContentView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "model.timepoint">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "Model.fetchfromfile(filename:):Model.swift">
-      </ContextState>
-      <ContextState
          contextName = "Model.init():Model.swift">
          <PersistentStrings>
             <PersistentString
@@ -22,10 +11,35 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "Model.fetchfromfile(filename:):Model.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in ContentView.body.getter:ContentView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "model.timepoint">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "ComplicationController.createGraphicCircleTemplate(forDate:):ComplicationController.swift">
          <PersistentStrings>
             <PersistentString
+               value = "Calendar.current">
+            </PersistentString>
+            <PersistentString
+               value = "Model.timepointasdate">
+            </PersistentString>
+            <PersistentString
                value = "timepointasstring">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in closure #1 in ContentView.body.getter:ContentView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Model.timepointasdate">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
